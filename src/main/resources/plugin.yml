@@ -1,0 +1,10 @@
+name: SignNick
+version: ${project.version}
+main: me.hsgamer.nick.Nick
+api-version: 1.13
+depend: [ProtocolLib]
+description: NickName with sign-based editor
+
+commands:
+  nick:
+    description: Change nick
