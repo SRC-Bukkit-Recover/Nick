@@ -1,5 +1,7 @@
 package me.hsgamer.nick;
 
+import me.hsgamer.nick.command.NickCommand;
+import me.hsgamer.nick.command.UnNickCommand;
 import me.hsgamer.nick.files.ConfigFile;
 import me.hsgamer.nick.utils.SignMenuFactory;
 import me.hsgamer.nick.utils.Utils;
@@ -29,7 +31,8 @@ public final class Nick extends JavaPlugin {
         this.configFile = new ConfigFile(this);
         this.signMenuFactory = new SignMenuFactory(this);
 
-        getServer().getPluginCommand("nick").setExecutor(new Command());
+        getServer().getPluginCommand("nick").setExecutor(new NickCommand());
+        getServer().getPluginCommand("unnick").setExecutor(new UnNickCommand());
     }
 
     @Override

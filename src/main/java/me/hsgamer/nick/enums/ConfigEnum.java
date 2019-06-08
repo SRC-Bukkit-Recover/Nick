@@ -11,7 +11,8 @@ public enum ConfigEnum {
     SUCCESSFUL("messages.successful", "&aSuccessfully changed"),
     NOT_BLANK("messages.not-blank", "&cYou should not leave your nickname blank"),
     // SETTINGS
-    PERMISSION("settings.permission", "nick.use"),
+    PERMISSION_NICK("settings.permissions.nick", "nick.nick"),
+    PERMISSION_UNNICK("settings.permissions.nick", "nick.unnick"),
     ;
     String path;
     Object def;
