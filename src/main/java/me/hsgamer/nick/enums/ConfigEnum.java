@@ -12,7 +12,7 @@ public enum ConfigEnum {
     NOT_BLANK("messages.not-blank", "&cYou should not leave your nickname blank"),
     // SETTINGS
     PERMISSION_NICK("settings.permissions.nick", "nick.nick"),
-    PERMISSION_UNNICK("settings.permissions.nick", "nick.unnick"),
+    PERMISSION_UNNICK("settings.permissions.unnick", "nick.unnick"),
     ;
     String path;
     Object def;
