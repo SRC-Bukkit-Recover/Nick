@@ -26,11 +26,11 @@ public final class Nick extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        Utils.sendMessage(getServer().getConsoleSender(), "&b&l===================================");
-        Utils.sendMessage(getServer().getConsoleSender(), "&e&lPlugin: &f" + getDescription().getName());
-        Utils.sendMessage(getServer().getConsoleSender(), "&e&lVersion: &f" + getDescription().getVersion());
-        Utils.sendMessage(getServer().getConsoleSender(), "&e&lAuthors: &f" + getDescription().getAuthors());
-        Utils.sendMessage(getServer().getConsoleSender(), "&b&l===================================");
+        Utils.sendMessage(getServer().getConsoleSender(), "&b&l===================================", false);
+        Utils.sendMessage(getServer().getConsoleSender(), "&e&lPlugin: &f" + getDescription().getName(), false);
+        Utils.sendMessage(getServer().getConsoleSender(), "&e&lVersion: &f" + getDescription().getVersion(), false);
+        Utils.sendMessage(getServer().getConsoleSender(), "&e&lAuthors: &f" + getDescription().getAuthors(), false);
+        Utils.sendMessage(getServer().getConsoleSender(), "&b&l===================================", false);
 
         this.configFile = new ConfigFile(this);
         this.signMenuFactory = new SignMenuFactory(this);

@@ -13,7 +13,7 @@ public class UnNickCommand implements CommandExecutor {
         if (sender instanceof Player) {
             if (sender.hasPermission((String) Utils.getValueFromConfig(ConfigEnum.PERMISSION_UNNICK))) {
                 ((Player) sender).setDisplayName(sender.getName());
-                Utils.sendMessage(sender, ConfigEnum.SUCCESSFUL);
+                Utils.sendMessage(sender, String.valueOf(Utils.getValueFromConfig(ConfigEnum.SUCCESSFUL)).replace("%name%", sender.getName()), true);
             } else {
                 Utils.sendMessage(sender, ConfigEnum.NO_PERMISSION);
             }

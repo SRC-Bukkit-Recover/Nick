@@ -7,15 +7,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Utils {
-    public static void sendMessage(CommandSender sender, String message) {
-        sender.sendMessage(colornize(message));
+    public static void sendMessage(CommandSender sender, String message, boolean enablePrefix) {
+        String prefix = (String) getValueFromConfig(ConfigEnum.PREFIX);
+        if (enablePrefix) {
+            sender.sendMessage(colornize(prefix + message));
+        } else {
+            sender.sendMessage(colornize(message));
+        }
     }
 
     public static void sendMessage(CommandSender sender, ConfigEnum configEnum) {
         String prefix = (String) getValueFromConfig(ConfigEnum.PREFIX);
         String message = (String) getValueFromConfig(configEnum);
 
-        sendMessage(sender, prefix + message);
+        sendMessage(sender, prefix + message, true);
     }
 
     public static Object getValueFromConfig(ConfigEnum configEnum) {
