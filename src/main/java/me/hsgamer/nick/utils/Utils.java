@@ -8,8 +8,8 @@ import org.bukkit.entity.Player;
 
 public class Utils {
     public static void sendMessage(CommandSender sender, String message, boolean enablePrefix) {
-        String prefix = (String) getValueFromConfig(ConfigEnum.PREFIX);
         if (enablePrefix) {
+            String prefix = (String) getValueFromConfig(ConfigEnum.PREFIX);
             sender.sendMessage(colornize(prefix + message));
         } else {
             sender.sendMessage(colornize(message));
