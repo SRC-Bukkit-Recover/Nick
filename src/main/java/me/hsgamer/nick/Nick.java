@@ -13,9 +13,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class Nick extends JavaPlugin {
 
     private static Nick instance;
+    public boolean IS_ESSENTIALS_ENABLED;
     private SignMenuFactory signMenuFactory;
     private ConfigFile configFile;
-    public boolean IS_ESSENTIALS_ENABLED;
     private Essentials essentials;
 
     public static Nick getInstance() {

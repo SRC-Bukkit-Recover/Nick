@@ -713,7 +713,7 @@ public enum UMaterial {
     LIME_WALL_BANNER(10, "BANNER", null, null, null, null, "LIME_WALL_BANNER"),
     LIME_WOOL(5, "WOOL", null, null, null, null, "LIME_WOOL"),
     LINGERING_POTION(null, null, null, null, null, null, "LINGERING_POTION"),
-    LINGERING_POTION_AWKWARD(PotionBase.LINGERING,"AWKWARD", false, false, null, "LINGERING_POTION"),
+    LINGERING_POTION_AWKWARD(PotionBase.LINGERING, "AWKWARD", false, false, null, "LINGERING_POTION"),
     LINGERING_POTION_FIRE_RESISTANCE(PotionBase.LINGERING, "FIRE_RESISTANCE", false, false, null, "LINGERING_POTION"),
     LINGERING_POTION_FIRE_RESISTANCE_EXTENDED(PotionBase.LINGERING, "FIRE_RESISTANCE", true, false, null, "LINGERING_POTION"),
     LINGERING_POTION_HARMING_1(PotionBase.LINGERING, "INSTANT_DAMAGE", false, false, null, "LINGERING_POTION"),
@@ -789,7 +789,7 @@ public enum UMaterial {
     MOSSY_COBBLESTONE_SLAB(null, null, null, null, null, null, "MOSSY_COBBLESTONE_SLAB"),
     MOSSY_COBBLESTONE_STAIRS(null, null, null, null, null, null, "MOSSY_COBBLESTONE_STAIRS"),
     MOSSY_COBBLESTONE_WALL(1, "COBBLE_WALL", null, null, null, null, "MOSSY_COBBLESTONE_WALL"),
-    MOSSY_STONE_BRICK_SLAB(null, null, null, null, null,  null, "MOSSY_STONE_BRICK_SLAB"),
+    MOSSY_STONE_BRICK_SLAB(null, null, null, null, null, null, "MOSSY_STONE_BRICK_SLAB"),
     MOSSY_STONE_BRICK_STAIRS(null, null, null, null, null, null, "MOSSY_STONE_BRICK_STAIRS"),
     MOSSY_STONE_BRICK_WALL(null, null, null, null, null, null, "MOSSY_STONE_BRICK_WALL"),
     MOSSY_STONE_BRICKS(1, "SMOOTH_BRICK", null, null, null, null, "MOSSY_STONE_BRICKS"),
@@ -1356,109 +1356,63 @@ public enum UMaterial {
     ZOMBIE_PIGMAN_SPAWN_EGG(57, "MONSTER_EGG", null, null, null, null, "ZOMBIE_PIGMAN_SPAWN_EGG"),
     ZOMBIE_SPAWN_EGG(54, "MONSTER_EGG", null, null, null, null, "ZOMBIE_SPAWN_EGG"),
     ZOMBIE_VILLAGER_SPAWN_EGG(null, null, null, null, null, "ZOMBIE_VILLAGER_SPAWN_EGG"),
-    ZOMBIE_WALL_HEAD(2, "SKULL", null, null, null, null, null, "ZOMBIE_WALL_HEAD")
-    ;
-    private static String version = Bukkit.getVersion();
+    ZOMBIE_WALL_HEAD(2, "SKULL", null, null, null, null, null, "ZOMBIE_WALL_HEAD");
     private static final HashMap<String, UMaterial> inUMemory = new HashMap<>();
     private static final HashMap<String, ItemStack> inMemory = new HashMap<>();
+    private static String version = Bukkit.getVersion();
     private String[] names = new String[8];
     private String versionName, attributes;
     private byte data;
-    UMaterial(String ...names) {
+
+    UMaterial(String... names) {
         this(0, names);
     }
+
     UMaterial(String name, int data) {
         names[0] = name;
         versionName = name;
         this.data = (byte) data;
     }
+
     UMaterial(String name, int spoofedData, Color color) {
         names[0] = name;
         versionName = name;
         this.data = (byte) spoofedData;
         attributes = "color=" + color.getRed() + ":" + color.getGreen() + ":" + color.getBlue();
     }
-    UMaterial(PotionBase base, String type, boolean extended, boolean upgraded, String ...names) {
+
+    UMaterial(PotionBase base, String type, boolean extended, boolean upgraded, String... names) {
         this.names = names;
         attributes = "upotion=" + base.name() + ":" + type + ":" + extended + ":" + upgraded;
     }
+
     UMaterial(String name, Enchantment enchant, int level) {
         names[0] = name;
         versionName = name;
         data = 0;
         attributes = "enchant=" + enchant.getName() + ":" + level;
     }
-    UMaterial(int data, String ...names) {
+
+    UMaterial(int data, String... names) {
         this.names = names;
         this.data = (byte) data;
     }
-    public String getVersionName() {
-        if(versionName == null) {
-            final Material m = getMaterial();
-            if(m != null) versionName = m.name();
-        }
-        return versionName;
-    }
-    public ItemStack getItemStack() {
-        final String v = getVersionName();
-        final Material m = v != null ? Material.valueOf(v) : null;
-        ItemStack is = m != null ? new ItemStack(m) : null;
-        if(is != null && attributes != null) {
-            for(String s : attributes.split(";")) {
-                if(s.startsWith("color=")) {
-                    final String[] a = s.split(":");
-                    final LeatherArmorMeta me = (LeatherArmorMeta) is.getItemMeta();
-                    me.setColor(Color.fromRGB(Integer.parseInt(a[0]), Integer.parseInt(a[1]), Integer.parseInt(a[2])));
-                    is.setItemMeta(me);
-                } else if(s.startsWith("enchant=")) {
-                    final String[] e = s.split("=")[1].split(":");
-                    final EnchantmentStorageMeta sm = (EnchantmentStorageMeta) is.getItemMeta();
-                    sm.addStoredEnchant(Enchantment.getByName(e[0]), Integer.parseInt(e[1]), true);
-                    is.setItemMeta(sm);
-                } else if(s.startsWith("upotion=")) {
-                    final String[] p = s.split("=")[1].split(":");
-                    is = new UPotion(PotionBase.valueOf(p[0]), p[1], Boolean.parseBoolean(p[2]), Boolean.parseBoolean(p[3])).getItemStack();
-                }
-            }
-        }
-        return is;
-    }
-    public byte getData() { return data; }
-    // 0 = 1.8.8
-    // 1 = 1.9.4
-    // 2 = 1.10.2
-    // 3 = 1.11.2
-    // 4 = 1.12.2
-    // 5 = 1.13.2
-    // 6 = 1.14.2
-    public Material getMaterial() {
-        final int ver = version.contains("1.8") ? 0 : version.contains("1.9") ? 1 : version.contains("1.10") ? 2 : version.contains("1.11") ? 3 : version.contains("1.12") ? 4 : version.contains("1.13") ? 5 : version.contains("1.14") ? 6 : names.length-1;
-        int realver = names.length <= ver ? names.length-1 : ver;
-        if(names[realver] == null) {
-            boolean did = false;
-            for(int i = realver; i >= 0; i--) {
-                if(!did && names[i] != null) {
-                    realver = i;
-                    did = true;
-                }
-            }
-        }
-        final String t = names[realver], t2 = names.length > ver ? names[ver] : names[names.length-1];
-        return t != null || t2 != null ? Material.matchMaterial(t != null ? t : t2) : null;
-    }
+
     public static ItemStack getEnchantmentBook(Enchantment enchant, int level, int amount) {
         final LinkedHashMap<Enchantment, Integer> e = new LinkedHashMap<>();
         e.put(enchant, level);
         return getEnchantmentBook(e, amount);
     }
+
     public static ItemStack getEnchantmentBook(LinkedHashMap<Enchantment, Integer> enchants, int amount) {
         final ItemStack s = new ItemStack(Material.ENCHANTED_BOOK, amount);
         final EnchantmentStorageMeta sm = (EnchantmentStorageMeta) s;
-        for(Enchantment enchant : enchants.keySet())
+        for (Enchantment enchant : enchants.keySet())
             sm.addStoredEnchant(enchant, enchants.get(enchant), true);
         s.setItemMeta(sm);
         return s;
     }
+
     public static ItemStack getColoredLeather(Material m, int amount, int red, int green, int blue) {
         final ItemStack i = new ItemStack(m, amount);
         final LeatherArmorMeta lam = (LeatherArmorMeta) i.getItemMeta();
@@ -1466,14 +1420,15 @@ public enum UMaterial {
         i.setItemMeta(lam);
         return i;
     }
+
     @Deprecated
     public static UMaterial match(String name, byte data) {
         name = name.toUpperCase();
-        if(inUMemory.containsKey(name + data)) return inUMemory.get(name + data);
-        for(UMaterial u : UMaterial.values()) {
-            if(u.getData() == data) {
-                for(String n : u.names) {
-                    if(n != null && n.equals(name)) {
+        if (inUMemory.containsKey(name + data)) return inUMemory.get(name + data);
+        for (UMaterial u : UMaterial.values()) {
+            if (u.getData() == data) {
+                for (String n : u.names) {
+                    if (n != null && n.equals(name)) {
                         inUMemory.put(name + data, u);
                         return u;
                     }
@@ -1482,14 +1437,15 @@ public enum UMaterial {
         }
         return null;
     }
+
     @Deprecated
     public static ItemStack valueOf(String name, byte data) {
         name = name.toUpperCase();
-        if(inMemory.keySet().contains(name + data)) return inMemory.get(name + data).clone();
-        for(UMaterial u : UMaterial.values()) {
-            if(u.getData() == data) {
-                for(String n : u.names) {
-                    if(n != null && n.equals(name)) {
+        if (inMemory.keySet().contains(name + data)) return inMemory.get(name + data).clone();
+        for (UMaterial u : UMaterial.values()) {
+            if (u.getData() == data) {
+                for (String n : u.names) {
+                    if (n != null && n.equals(name)) {
                         final ItemStack i = u.getItemStack();
                         inMemory.put(name + data, i);
                         return i;
@@ -1499,12 +1455,13 @@ public enum UMaterial {
         }
         return null;
     }
+
     public static UMaterial matchSpawnEgg(ItemStack egg) {
-        if(egg != null) {
+        if (egg != null) {
             final String v = Bukkit.getVersion();
-            if(v.contains("1.8")) {
+            if (v.contains("1.8")) {
                 return match("MONSTER_EGG", egg.getData().getData());
-            } else if(v.contains("1.9") || v.contains("1.10") || v.contains("1.11") || v.contains("1.12")) {
+            } else if (v.contains("1.9") || v.contains("1.10") || v.contains("1.11") || v.contains("1.12")) {
                 final String id = egg.hasItemMeta() ? egg.getItemMeta().toString().split("id=")[1].split("}")[0].toUpperCase() : "PIG";
                 return match(id + "_SPAWN_EGG");
             } else {
@@ -1513,11 +1470,12 @@ public enum UMaterial {
         }
         return null;
     }
+
     public static UMaterial matchEnchantedBook(ItemStack book) {
-        if(book != null && book.getItemMeta() instanceof EnchantmentStorageMeta) {
+        if (book != null && book.getItemMeta() instanceof EnchantmentStorageMeta) {
             final EnchantmentStorageMeta m = (EnchantmentStorageMeta) book.getItemMeta();
             final Map<Enchantment, Integer> s = m.getStoredEnchants();
-            if(s.size() == 1) {
+            if (s.size() == 1) {
                 final Enchantment e = (Enchantment) s.keySet().toArray()[0];
                 final int l = s.get(e);
                 final String n = e.getName(), name =
@@ -1547,16 +1505,17 @@ public enum UMaterial {
         }
         return null;
     }
+
     public static UMaterial matchPotion(ItemStack potion, PotionBase base) {
-        if(potion != null && potion.getItemMeta() instanceof PotionMeta) {
+        if (potion != null && potion.getItemMeta() instanceof PotionMeta) {
             final String v = Bukkit.getVersion();
             final PotionMeta p = (PotionMeta) potion.getItemMeta();
             final List<PotionEffect> ce = p.getCustomEffects();
-            if(ce.size() == 0) {
+            if (ce.size() == 0) {
                 final PotionEffectType t;
                 final int l, max;
                 final boolean extended;
-                if(v.contains("1.8")) {
+                if (v.contains("1.8")) {
                     final Potion po = Potion.fromItemStack(potion);
                     t = ((PotionEffect) po.getEffects().toArray()[0]).getType();
                     l = po.getLevel();
@@ -1584,11 +1543,12 @@ public enum UMaterial {
         }
         return null;
     }
+
     @Deprecated
     public static UMaterial match(ItemStack item) {
-        if(item != null) {
+        if (item != null) {
             final String n = item.getType().name(), v = Bukkit.getVersion();
-            if(!v.contains("1.8") && !v.contains("1.9") && !v.contains("1.10") && !v.contains("1.11") && !v.contains("1.12")) {
+            if (!v.contains("1.8") && !v.contains("1.9") && !v.contains("1.10") && !v.contains("1.11") && !v.contains("1.12")) {
                 return match(n);
             }
             final byte d = n.equals("FLINT_AND_STEEL") ? 0 : item.getData().getData();
@@ -1598,87 +1558,89 @@ public enum UMaterial {
         }
         return null;
     }
+
     public static UMaterial getItem(Block block) {
         final Material type = block.getType();
         final String m = type.name(), v = Bukkit.getVersion();
         final byte d = block.getData();
         UMaterial t = null;
-        if(!v.contains("1.8") && !v.contains("1.9") && !v.contains("1.10") && !v.contains("1.11") && !v.contains("1.12") || m.contains("TERRACOTTA") || m.startsWith("TORCH") || m.startsWith("REDSTONE_TORCH") || m.contains("STAIRS") || m.equals("FLINT_AND_STEEL") || m.equals("SOIL") || m.equals("LADDER") || m.equals("BONE_BLOCK") || m.equals("OBSERVER") || m.contains("FENCE_GATE") || m.contains("TRAPDOOR") || m.contains("CHEST")
+        if (!v.contains("1.8") && !v.contains("1.9") && !v.contains("1.10") && !v.contains("1.11") && !v.contains("1.12") || m.contains("TERRACOTTA") || m.startsWith("TORCH") || m.startsWith("REDSTONE_TORCH") || m.contains("STAIRS") || m.equals("FLINT_AND_STEEL") || m.equals("SOIL") || m.equals("LADDER") || m.equals("BONE_BLOCK") || m.equals("OBSERVER") || m.contains("FENCE_GATE") || m.contains("TRAPDOOR") || m.contains("CHEST")
                 || m.equals("DISPENSER") || m.equals("DROPPER") || m.equals("JACK_O_LANTERN") || m.equals("PUMPKIN") || m.equals("HAY_BLOCK") || m.contains("SHULKER_BOX") || m.equals("LEVER") || m.contains("BUTTON") || m.contains("RAIL") || m.equals("FURNACE") || m.equals("VINE") || m.equals("TRIPWIRE_HOOK") || m.equals("HOPPER") || m.equals("END_ROD")) {
             return match(m);
-        } else if(m.startsWith("LOG")) {
+        } else if (m.startsWith("LOG")) {
             final boolean log2 = m.equals("LOG_2");
-            if(d == 8) {
+            if (d == 8) {
                 t = UMaterial.ACACIA_WOOD;
-            } else if(d == 12) {
+            } else if (d == 12) {
                 t = log2 ? UMaterial.ACACIA_WOOD : UMaterial.OAK_WOOD;
-            } else if(d == 13) {
+            } else if (d == 13) {
                 t = log2 ? UMaterial.DARK_OAK_WOOD : UMaterial.SPRUCE_WOOD;
-            } else if(d == 14) {
+            } else if (d == 14) {
                 t = UMaterial.BIRCH_WOOD;
-            } else if(d == 15) {
+            } else if (d == 15) {
                 t = UMaterial.JUNGLE_WOOD;
             }
-        } else if(m.startsWith("LEAVES")) {
+        } else if (m.startsWith("LEAVES")) {
             final org.bukkit.material.Leaves l = new org.bukkit.material.Leaves(type, d);
             t = match(l.getSpecies().name().replace("GENERIC", "OAK").replace("REDWOOD", "SPRUCE") + "_LEAVES");
-        } else if(m.contains("SAPLING")) {
-            if(v.contains("1.8")) {
+        } else if (m.contains("SAPLING")) {
+            if (v.contains("1.8")) {
                 t = match("SAPLING", d);
             } else {
                 final org.bukkit.material.Sapling s = new org.bukkit.material.Sapling(type, d);
                 t = match(s.getSpecies().name().replace("GENERIC", "OAK").replace("REDWOOD", "SPRUCE") + "_SAPLING");
             }
-        } else if(m.contains("_DOOR")) {
+        } else if (m.contains("_DOOR")) {
             t = match(type.name().replace("WOODEN_DOOR", "OAK_DOOR"));
-        } else if(m.contains("STEP")) {
+        } else if (m.contains("STEP")) {
             final org.bukkit.material.WoodenStep s = new org.bukkit.material.WoodenStep(type, d);
             t = match(s.getSpecies().name().replace("GENERIC", "OAK").replace("REDWOOD", "SPRUCE") + "_SLAB");
-        } else if(m.contains("BED_BLOCK")) {
-            if(v.contains("1.12")) {
+        } else if (m.contains("BED_BLOCK")) {
+            if (v.contains("1.12")) {
                 final org.bukkit.block.Bed b = (org.bukkit.block.Bed) block.getState();
                 t = match(b.getColor().name() + "_BED");
             } else return UMaterial.WHITE_BED;
-        } else if(m.contains("CROP")) {
+        } else if (m.contains("CROP")) {
             return UMaterial.AIR;
-        } else if(m.contains("PISTON_")) {
+        } else if (m.contains("PISTON_")) {
             return m.contains("_STICKY_") ? UMaterial.STICKY_PISTON : UMaterial.PISTON;
-        } else if(m.contains("BANNER")) {
+        } else if (m.contains("BANNER")) {
             final org.bukkit.block.Banner b = (org.bukkit.block.Banner) block.getState();
             t = match(b.getBaseColor().name() + "_BANNER");
-        } else if(m.contains("SIGN")) {
+        } else if (m.contains("SIGN")) {
             return UMaterial.OAK_SIGN;
-        } else if(m.equals("COCOA")) {
+        } else if (m.equals("COCOA")) {
             return UMaterial.COCOA_BEANS;
-        } else if(m.equals("BREWING_STAND") || m.equals("CAULDRON")) {
+        } else if (m.equals("BREWING_STAND") || m.equals("CAULDRON")) {
             return UMaterial.valueOf(m + "_ITEM");
-        } else if(m.startsWith("DIODE")) {
+        } else if (m.startsWith("DIODE")) {
             return UMaterial.REPEATER;
-        } else if(m.startsWith("REDSTONE_COMPARATOR")) {
+        } else if (m.startsWith("REDSTONE_COMPARATOR")) {
             return UMaterial.COMPARATOR;
-        } else if(m.startsWith("END") && m.endsWith("_PORTAL_FAME")) {
+        } else if (m.startsWith("END") && m.endsWith("_PORTAL_FAME")) {
             return UMaterial.END_PORTAL_FRAME;
         }
         return t != null ? t : match(m, d);
     }
+
     public static UMaterial match(String name) {
         try {
             return UMaterial.valueOf(name.toUpperCase());
         } catch (Exception e) {
             final byte d = name.contains(":") ? Byte.parseByte(name.split(":")[1]) : 0;
             name = name.split(":")[0].toUpperCase();
-            if(inUMemory.containsKey(name + d)) return inUMemory.get(name + d);
-            for(UMaterial u : UMaterial.values()) {
-                if(u.name().equals(name)) {
+            if (inUMemory.containsKey(name + d)) return inUMemory.get(name + d);
+            for (UMaterial u : UMaterial.values()) {
+                if (u.name().equals(name)) {
                     inUMemory.put(name, u);
                     return u;
                 }
                 final byte D = u.getData();
-                if(D == d) {
+                if (D == d) {
                     final String[] names = u.names;
-                    for(String n : names) {
-                        if(n != null && n.equals(name)) {
-                            for(String na : names) inUMemory.put(na, u);
+                    for (String n : names) {
+                        if (n != null && n.equals(name)) {
+                            for (String na : names) inUMemory.put(na, u);
                             return u;
                         }
                     }
@@ -1687,7 +1649,68 @@ public enum UMaterial {
         }
         return null;
     }
-    public enum PotionBase { NORMAL, ARROW, TIPPED_ARROW, LINGERING, SPLASH, }
+
+    public String getVersionName() {
+        if (versionName == null) {
+            final Material m = getMaterial();
+            if (m != null) versionName = m.name();
+        }
+        return versionName;
+    }
+
+    public ItemStack getItemStack() {
+        final String v = getVersionName();
+        final Material m = v != null ? Material.valueOf(v) : null;
+        ItemStack is = m != null ? new ItemStack(m) : null;
+        if (is != null && attributes != null) {
+            for (String s : attributes.split(";")) {
+                if (s.startsWith("color=")) {
+                    final String[] a = s.split(":");
+                    final LeatherArmorMeta me = (LeatherArmorMeta) is.getItemMeta();
+                    me.setColor(Color.fromRGB(Integer.parseInt(a[0]), Integer.parseInt(a[1]), Integer.parseInt(a[2])));
+                    is.setItemMeta(me);
+                } else if (s.startsWith("enchant=")) {
+                    final String[] e = s.split("=")[1].split(":");
+                    final EnchantmentStorageMeta sm = (EnchantmentStorageMeta) is.getItemMeta();
+                    sm.addStoredEnchant(Enchantment.getByName(e[0]), Integer.parseInt(e[1]), true);
+                    is.setItemMeta(sm);
+                } else if (s.startsWith("upotion=")) {
+                    final String[] p = s.split("=")[1].split(":");
+                    is = new UPotion(PotionBase.valueOf(p[0]), p[1], Boolean.parseBoolean(p[2]), Boolean.parseBoolean(p[3])).getItemStack();
+                }
+            }
+        }
+        return is;
+    }
+
+    public byte getData() {
+        return data;
+    }
+
+    // 0 = 1.8.8
+    // 1 = 1.9.4
+    // 2 = 1.10.2
+    // 3 = 1.11.2
+    // 4 = 1.12.2
+    // 5 = 1.13.2
+    // 6 = 1.14.2
+    public Material getMaterial() {
+        final int ver = version.contains("1.8") ? 0 : version.contains("1.9") ? 1 : version.contains("1.10") ? 2 : version.contains("1.11") ? 3 : version.contains("1.12") ? 4 : version.contains("1.13") ? 5 : version.contains("1.14") ? 6 : names.length - 1;
+        int realver = names.length <= ver ? names.length - 1 : ver;
+        if (names[realver] == null) {
+            boolean did = false;
+            for (int i = realver; i >= 0; i--) {
+                if (!did && names[i] != null) {
+                    realver = i;
+                    did = true;
+                }
+            }
+        }
+        final String t = names[realver], t2 = names.length > ver ? names[ver] : names[names.length - 1];
+        return t != null || t2 != null ? Material.matchMaterial(t != null ? t : t2) : null;
+    }
+
+    public enum PotionBase {NORMAL, ARROW, TIPPED_ARROW, LINGERING, SPLASH,}
 }
 
 class UPotion {
@@ -1697,6 +1720,7 @@ class UPotion {
     private final ItemStack potion;
     private final PotionType type;
     private final Object potiondata;
+
     public UPotion(UMaterial.PotionBase base, String type, boolean extended, boolean upgraded) {
         this.base = base;
         type = type.toUpperCase();
@@ -1704,7 +1728,7 @@ class UPotion {
                 ? PotionType.WATER : PotionType.valueOf(type);
         this.type = t;
         final String bn = base.name();
-        if(eight) {
+        if (eight) {
             potion = t.equals(PotionType.WATER) ? new Potion(t).toItemStack(1) : new Potion(t, upgraded ? 2 : 1, bn.equals("SPLASH")).toItemStack(1);
             potiondata = potion.getItemMeta();
         } else {
@@ -1712,20 +1736,32 @@ class UPotion {
             final boolean a = !is.getType().equals(Material.ARROW);
             org.bukkit.inventory.meta.PotionMeta pm = null;
             org.bukkit.potion.PotionData pd = null;
-            if(a) {
+            if (a) {
                 pm = (org.bukkit.inventory.meta.PotionMeta) is.getItemMeta();
                 pd = new org.bukkit.potion.PotionData(t, t.isExtendable() && extended, t.isUpgradeable() && upgraded);
             }
             potiondata = pd;
-            if(a) {
+            if (a) {
                 pm.setBasePotionData(pd);
                 is.setItemMeta(pm);
             }
             potion = is;
         }
     }
-    public UMaterial.PotionBase getBase() { return base; }
-    public PotionType getType() { return type; }
-    public ItemStack getItemStack() { return potion.clone(); }
-    public Object getPotionData() { return potiondata; }
+
+    public UMaterial.PotionBase getBase() {
+        return base;
+    }
+
+    public PotionType getType() {
+        return type;
+    }
+
+    public ItemStack getItemStack() {
+        return potion.clone();
+    }
+
+    public Object getPotionData() {
+        return potiondata;
+    }
 }

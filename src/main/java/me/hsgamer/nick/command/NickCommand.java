@@ -4,7 +4,6 @@ import me.hsgamer.nick.Nick;
 import me.hsgamer.nick.enums.ConfigEnum;
 import me.hsgamer.nick.utils.Utils;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
