@@ -5,6 +5,7 @@ authors:
   - HSGamer
 api-version: 1.13
 depend: [ProtocolLib]
+softdepend: [Essentials]
 description: NickName with sign-based editor
 
 commands:

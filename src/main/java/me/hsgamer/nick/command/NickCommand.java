@@ -4,6 +4,7 @@ import me.hsgamer.nick.Nick;
 import me.hsgamer.nick.enums.ConfigEnum;
 import me.hsgamer.nick.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -39,8 +40,8 @@ public class NickCommand implements CommandExecutor {
                     if (nick.isEmpty()) {
                         Utils.sendMessage(player, ConfigEnum.NOT_BLANK);
                     } else {
-                        player.setDisplayName(nick);
-                        Utils.sendMessage(player, ConfigEnum.SUCCESSFUL);
+                        Utils.setDisplayName(player, Utils.colornize(nick));
+                        Utils.sendMessage(player, String.valueOf(Utils.getValueFromConfig(ConfigEnum.SUCCESSFUL)).replace("%name%", nick));
                     }
                     return true;
                 }))
