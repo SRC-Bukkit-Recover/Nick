@@ -8,7 +8,7 @@ public enum ConfigEnum {
     PLAYER_ONLY("messages.player-only", "&cYou must be a player to do this"),
     SIGN_LINES("messages.sign-lines", Arrays.asList("^^^^^^^^^^^^^", "&aType the nickname that", "&ayou want to change")),
     NO_PERMISSION("messages.no-permission", "&cYou don't have permission to do this"),
-    SUCCESSFUL("messages.successful", "&aSuccessfully changed"),
+    SUCCESSFUL("messages.successful", "&aSuccessfully changed to %name%"),
     NOT_BLANK("messages.not-blank", "&cYou should not leave your nickname blank"),
     // SETTINGS
     PERMISSION_NICK("settings.permissions.nick", "nick.nick"),
