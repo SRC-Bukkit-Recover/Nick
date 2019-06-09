@@ -8,7 +8,6 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -75,7 +74,7 @@ public final class SignMenuFactory {
                 if (!success && menu.reopenIfFail) {
                     Bukkit.getScheduler().runTaskLater(plugin, menu::open, 2L);
                 }
-                player.sendBlockChange(blockPosition.toLocation(player.getWorld()), Material.AIR.createBlockData());
+                player.sendBlockChange(blockPosition.toLocation(player.getWorld()), Material.AIR, (byte) 0);
             }
         });
     }
@@ -114,7 +113,7 @@ public final class SignMenuFactory {
             Location location = this.player.getLocation();
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), 0, location.getBlockZ());
 
-            player.sendBlockChange(blockPosition.toLocation(location.getWorld()), UMaterial.OAK_WALL_SIGN.getMaterial().createBlockData());
+            player.sendBlockChange(blockPosition.toLocation(location.getWorld()), UMaterial.OAK_WALL_SIGN.getMaterial(), (byte) 0);
 
             PacketContainer openSign = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);
             PacketContainer signData = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);
@@ -123,7 +122,7 @@ public final class SignMenuFactory {
 
             NbtCompound signNBT = (NbtCompound) signData.getNbtModifier().read(0);
 
-            IntStream.range(0, SIGN_LINES).forEach(line -> signNBT.put("Text" + (line + 1), text.size() > line ? String.format(NBT_FORMAT, color(text.get(line))) : "WW"));
+            IntStream.range(0, SIGN_LINES).forEach(line -> signNBT.put("Text" + (line + 1), text.size() > line ? String.format(NBT_FORMAT, Utils.colornize(text.get(line))) : "WW"));
 
             signNBT.put("x", blockPosition.getX());
             signNBT.put("y", blockPosition.getY());
@@ -141,10 +140,6 @@ public final class SignMenuFactory {
                 exception.printStackTrace();
             }
             this.onOpen.accept(blockPosition);
-        }
-
-        private String color(String input) {
-            return ChatColor.translateAlternateColorCodes('&', input);
         }
     }
 }

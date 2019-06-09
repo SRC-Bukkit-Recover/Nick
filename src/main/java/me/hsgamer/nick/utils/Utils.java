@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 
 public class Utils {
     public static void sendMessage(CommandSender sender, String message) {
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+        sender.sendMessage(colornize(message));
     }
 
     public static void sendMessage(CommandSender sender, ConfigEnum configEnum) {
@@ -19,5 +19,9 @@ public class Utils {
 
     public static Object getValueFromConfig(ConfigEnum configEnum) {
         return Nick.getInstance().getConfigFile().getConfig().get(configEnum.getPath(), configEnum.getDef());
+    }
+
+    public static String colornize(String input) {
+        return ChatColor.translateAlternateColorCodes('&', input);
     }
 }
