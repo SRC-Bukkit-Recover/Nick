@@ -17,10 +17,9 @@ public class Utils {
     }
 
     public static void sendMessage(CommandSender sender, ConfigEnum configEnum) {
-        String prefix = (String) getValueFromConfig(ConfigEnum.PREFIX);
         String message = (String) getValueFromConfig(configEnum);
 
-        sendMessage(sender, prefix + message, true);
+        sendMessage(sender, message, true);
     }
 
     public static Object getValueFromConfig(ConfigEnum configEnum) {
