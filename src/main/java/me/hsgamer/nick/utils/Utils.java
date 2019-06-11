@@ -31,11 +31,14 @@ public class Utils {
         return ChatColor.translateAlternateColorCodes('&', input);
     }
 
-    public static void setDisplayName(Player player, String input) {
+    public static void setDisplayName(Player player, String nick) {
+        if (player.hasPermission((String) getValueFromConfig(ConfigEnum.PERMISSION_COLOR))) {
+            nick = colornize(nick);
+        }
         if (Nick.getInstance().IS_ESSENTIALS_ENABLED) {
-            Nick.getInstance().getEssentials().getUser(player).setNickname(input);
+            Nick.getInstance().getEssentials().getUser(player).setNickname(nick);
         } else {
-            player.setDisplayName(input);
+            player.setDisplayName(nick);
         }
     }
 }

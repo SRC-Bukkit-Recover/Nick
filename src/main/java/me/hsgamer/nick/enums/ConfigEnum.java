@@ -10,9 +10,11 @@ public enum ConfigEnum {
     NO_PERMISSION("messages.no-permission", "&cYou don't have permission to do this"),
     SUCCESSFUL("messages.successful", "&aSuccessfully changed to %name%"),
     NOT_BLANK("messages.not-blank", "&cYou should not leave your nickname blank"),
+    SAME_NAME("messages.same-name", "&cYou have the same name as your nickname, You don't need to do this"),
     // SETTINGS
     PERMISSION_NICK("settings.permissions.nick", "nick.nick"),
     PERMISSION_UNNICK("settings.permissions.unnick", "nick.unnick"),
+    PERMISSION_COLOR("settings.permissions.color", "nick.color")
     ;
     String path;
     Object def;
