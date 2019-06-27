@@ -14,8 +14,7 @@ public enum ConfigEnum {
     // SETTINGS
     PERMISSION_NICK("settings.permissions.nick", "nick.nick"),
     PERMISSION_UNNICK("settings.permissions.unnick", "nick.unnick"),
-    PERMISSION_COLOR("settings.permissions.color", "nick.color")
-    ;
+    PERMISSION_COLOR("settings.permissions.color", "nick.color");
     String path;
     Object def;
 

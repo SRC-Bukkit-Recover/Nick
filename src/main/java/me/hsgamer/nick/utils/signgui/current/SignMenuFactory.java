@@ -1,4 +1,4 @@
-package me.hsgamer.nick.utils;
+package me.hsgamer.nick.utils.signgui.current;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -7,6 +7,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
+import me.hsgamer.nick.utils.Utils;
+import me.hsgamer.nick.utils.signgui.SignMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,7 +28,6 @@ public final class SignMenuFactory {
 
     private static final int ACTION_INDEX = 9;
     private static final int SIGN_LINES = 4;
-    private static Material SIGN = null;
 
     private static final String NBT_FORMAT = "{\"text\":\"%s\"}";
     private static final String NBT_BLOCK_ID = "minecraft:sign";
@@ -41,11 +42,6 @@ public final class SignMenuFactory {
         this.inputReceivers = new HashMap<>();
         this.signLocations = new HashMap<>();
         this.listen();
-        try {
-            SIGN = Material.OAK_WALL_SIGN;
-        }  catch (NoSuchFieldError e) {
-            SIGN = Material.matchMaterial("WALL_SIGN");
-        }
     }
 
     public Menu newMenu(Player player, List<String> text) {
@@ -119,7 +115,7 @@ public final class SignMenuFactory {
             Location location = this.player.getLocation();
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), 0, location.getBlockZ());
 
-            player.sendBlockChange(blockPosition.toLocation(location.getWorld()), SIGN, (byte) 0);
+            player.sendBlockChange(blockPosition.toLocation(location.getWorld()), SignMaterial.SIGN, (byte) 0);
 
             PacketContainer openSign = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);
             PacketContainer signData = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);

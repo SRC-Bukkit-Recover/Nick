@@ -38,5 +38,14 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.ess3:LegacyProvider:2.16.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.ess3:ReflectionProvider:2.16.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.ess3:FlattenedProvider:2.16.1" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: org.bukkit:craftbukkit:1.8.8-R0.1-SNAPSHOT">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/craftbukkit-1.8.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
