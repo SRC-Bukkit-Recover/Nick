@@ -1,4 +1,4 @@
-package me.hsgamer.nick.utils.signgui.current;
+package me.hsgamer.nick.utils.signgui;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -6,8 +6,11 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
+import com.comphenix.protocol.wrappers.WrappedBlockData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +18,9 @@ import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
+import me.hsgamer.nick.Nick;
 import me.hsgamer.nick.utils.Utils;
-import me.hsgamer.nick.utils.signgui.SignMaterial;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,6 +58,28 @@ public final class SignMenuFactory {
     return menu;
   }
 
+  private static WrappedChatComponent[] wrap(String[] lines) {
+    List<WrappedChatComponent> wrappedChatComponents = new ArrayList<>();
+
+    for (String line : lines) {
+      line = line == null ? "" : line;
+      wrappedChatComponents.add(WrappedChatComponent.fromText(Utils.colornize(line)));
+    }
+
+    return wrappedChatComponents.toArray(new WrappedChatComponent[0]);
+  }
+
+  private static String[] unwrap(WrappedChatComponent[] components) {
+    List<String> stringList = new ArrayList<>();
+
+    for (WrappedChatComponent component : components) {
+      String text = IChatBaseComponent.ChatSerializer.a(component.getJson()).getText();
+      stringList.add(text);
+    }
+
+    return stringList.toArray(new String[0]);
+  }
+
   private void listen() {
     ProtocolLibrary.getProtocolManager()
         .addPacketListener(new PacketAdapter(this.plugin, PacketType.Play.Client.UPDATE_SIGN) {
@@ -61,7 +87,12 @@ public final class SignMenuFactory {
           public void onPacketReceiving(PacketEvent event) {
             PacketContainer packet = event.getPacket();
             Player player = event.getPlayer();
-            String[] input = packet.getStringArrays().read(0);
+            String[] input;
+            if (Nick.IS_LEGACY) {
+              input = unwrap(packet.getChatComponentArrays().read(0));
+            } else {
+              input = packet.getStringArrays().read(0);
+            }
 
             Menu menu = inputReceivers.remove(player);
             BlockPosition blockPosition = signLocations.remove(player);
@@ -76,8 +107,16 @@ public final class SignMenuFactory {
             if (!success && menu.reopenIfFail) {
               Bukkit.getScheduler().runTaskLater(plugin, menu::open, 2L);
             }
-            player.sendBlockChange(blockPosition.toLocation(player.getWorld()), Material.AIR,
-                (byte) 0);
+
+            PacketContainer remove = ProtocolLibrary.getProtocolManager()
+                .createPacket(PacketType.Play.Server.BLOCK_CHANGE);
+            remove.getBlockPositionModifier().write(0, blockPosition);
+            remove.getBlockData().write(0, WrappedBlockData.createData(Material.AIR));
+            try {
+              ProtocolLibrary.getProtocolManager().sendServerPacket(player, remove);
+            } catch (InvocationTargetException e) {
+              e.printStackTrace();
+            }
           }
         });
   }
@@ -117,31 +156,44 @@ public final class SignMenuFactory {
       BlockPosition blockPosition = new BlockPosition(location.getBlockX(), 0,
           location.getBlockZ());
 
-      player.sendBlockChange(blockPosition.toLocation(location.getWorld()), SignMaterial.SIGN,
-          (byte) 0);
+      PacketContainer block = ProtocolLibrary.getProtocolManager()
+          .createPacket(PacketType.Play.Server.BLOCK_CHANGE);
+      block.getBlockPositionModifier().write(0, blockPosition);
+      block.getBlockData().write(0, WrappedBlockData.createData(SignMaterial.SIGN));
 
       PacketContainer openSign = ProtocolLibrary.getProtocolManager()
           .createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);
-      PacketContainer signData = ProtocolLibrary.getProtocolManager()
-          .createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);
-
       openSign.getBlockPositionModifier().write(0, blockPosition);
 
-      NbtCompound signNBT = (NbtCompound) signData.getNbtModifier().read(0);
+      PacketContainer signData;
+      if (Nick.IS_LEGACY) {
+        signData = ProtocolLibrary.getProtocolManager()
+            .createPacket(PacketType.Play.Server.UPDATE_SIGN);
 
-      IntStream.range(0, SIGN_LINES).forEach(line -> signNBT.put("Text" + (line + 1),
-          text.size() > line ? String.format(NBT_FORMAT, Utils.colornize(text.get(line))) : "WW"));
+        signData.getBlockPositionModifier().write(0, blockPosition);
+        signData.getChatComponentArrays().write(0, wrap(text.toArray(new String[0])));
+      } else {
+        signData = ProtocolLibrary.getProtocolManager()
+            .createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);
 
-      signNBT.put("x", blockPosition.getX());
-      signNBT.put("y", blockPosition.getY());
-      signNBT.put("z", blockPosition.getZ());
-      signNBT.put("id", NBT_BLOCK_ID);
+        NbtCompound signNBT = (NbtCompound) signData.getNbtModifier().read(0);
 
-      signData.getBlockPositionModifier().write(0, blockPosition);
-      signData.getIntegers().write(0, ACTION_INDEX);
-      signData.getNbtModifier().write(0, signNBT);
+        IntStream.range(0, SIGN_LINES).forEach(line -> signNBT.put("Text" + (line + 1),
+            text.size() > line ? String.format(NBT_FORMAT, Utils.colornize(text.get(line)))
+                : "WW"));
+
+        signNBT.put("x", blockPosition.getX());
+        signNBT.put("y", blockPosition.getY());
+        signNBT.put("z", blockPosition.getZ());
+        signNBT.put("id", NBT_BLOCK_ID);
+
+        signData.getBlockPositionModifier().write(0, blockPosition);
+        signData.getIntegers().write(0, ACTION_INDEX);
+        signData.getNbtModifier().write(0, signNBT);
+      }
 
       try {
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, block);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, signData);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, openSign);
       } catch (InvocationTargetException exception) {
