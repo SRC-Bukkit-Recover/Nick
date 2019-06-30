@@ -47,17 +47,6 @@ public final class SignMenuFactory {
     this.listen();
   }
 
-  public Menu newMenu(Player player, List<String> text) {
-    Objects.requireNonNull(player, "player");
-    Objects.requireNonNull(text, "text");
-    Menu menu = new Menu(player, text);
-    menu.onOpen(blockPosition -> {
-      this.signLocations.put(player, blockPosition);
-      this.inputReceivers.putIfAbsent(player, menu);
-    });
-    return menu;
-  }
-
   private static WrappedChatComponent[] wrap(String[] lines) {
     List<WrappedChatComponent> wrappedChatComponents = new ArrayList<>();
 
@@ -78,6 +67,17 @@ public final class SignMenuFactory {
     }
 
     return stringList.toArray(new String[0]);
+  }
+
+  public Menu newMenu(Player player, List<String> text) {
+    Objects.requireNonNull(player, "player");
+    Objects.requireNonNull(text, "text");
+    Menu menu = new Menu(player, text);
+    menu.onOpen(blockPosition -> {
+      this.signLocations.put(player, blockPosition);
+      this.inputReceivers.putIfAbsent(player, menu);
+    });
+    return menu;
   }
 
   private void listen() {
