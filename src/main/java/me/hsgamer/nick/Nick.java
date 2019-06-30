@@ -27,8 +27,6 @@ public final class Nick extends JavaPlugin {
   public void onEnable() {
     instance = this;
 
-    IS_LEGACY = getServer().getVersion().contains("1.8");
-
     Utils.sendMessage(getServer().getConsoleSender(), "&b&l===================================",
         false);
     Utils.sendMessage(getServer().getConsoleSender(), "&e&lPlugin: &f" + getDescription().getName(),
@@ -41,6 +39,10 @@ public final class Nick extends JavaPlugin {
         false);
 
     this.configFile = new ConfigFile(this);
+
+    if (IS_LEGACY = getServer().getVersion().contains("1.8")) {
+      Utils.sendMessage(getServer().getConsoleSender(), "&eYou are using an old version of Bukkit. &bInitializing Legacy Listener...", true);
+    }
 
     if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
       IS_ESSENTIALS_ENABLED = true;
