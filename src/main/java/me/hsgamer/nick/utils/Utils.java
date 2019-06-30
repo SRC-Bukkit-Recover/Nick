@@ -43,4 +43,14 @@ public class Utils {
       player.setDisplayName(nick);
     }
   }
+
+  public static void setPlayerListName(Player player, String nick, boolean colornize) {
+    if ((boolean) getValueFromConfig(ConfigEnum.SET_PLAYER_LIST_NAME) && player.hasPermission((String) getValueFromConfig(ConfigEnum.PERMISSION_TABLIST_NAME))) {
+      if (colornize && player
+          .hasPermission((String) getValueFromConfig(ConfigEnum.PERMISSION_COLOR))) {
+        nick = colornize(nick);
+      }
+      player.setPlayerListName(nick);
+    }
+  }
 }

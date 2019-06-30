@@ -40,6 +40,7 @@ public class NickCommand implements CommandExecutor {
             Utils.sendMessage(player, ConfigEnum.NOT_BLANK);
           } else {
             Utils.setDisplayName(player, nick, true);
+            Utils.setPlayerListName(player, nick, true);
             Utils.sendMessage(player,
                 String.valueOf(Utils.getValueFromConfig(ConfigEnum.SUCCESSFUL))
                     .replace("%name%", nick), true);
