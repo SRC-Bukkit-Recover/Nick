@@ -1,7 +1,18 @@
 package me.hsgamer.nick.utils;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.google.common.collect.Lists;
+import java.util.List;
 import me.hsgamer.nick.Nick;
 import me.hsgamer.nick.enums.ConfigEnum;
+import me.hsgamer.nick.utils.wrapper.WrapperPlayServerPlayerInfo;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -53,5 +64,62 @@ public class Utils {
       }
       player.setPlayerListName(nick);
     }
+  }
+
+  public static void refreshPlayer(Player target) {
+    if ((boolean) getValueFromConfig(ConfigEnum.SET_NAME_TAG)) {
+      Bukkit.getScheduler().runTask(Nick.getInstance(), () -> {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+          player.hidePlayer(Nick.getInstance(), target);
+          player.showPlayer(Nick.getInstance(), target);
+        }
+      });
+    }
+  }
+
+  public static void addChangeNameTagListener() {
+    ProtocolLibrary.getProtocolManager().addPacketListener(
+        new PacketAdapter(Nick.getInstance(), PacketType.Play.Server.PLAYER_INFO) {
+
+          @Override
+          public void onPacketSending(PacketEvent event) {
+            WrapperPlayServerPlayerInfo wrapper = new WrapperPlayServerPlayerInfo(
+                event.getPacket());
+            Player target = event.getPlayer();
+
+            List<PlayerInfoData> playerInfoDataList = wrapper.getData();
+
+            if (wrapper.getAction() != PlayerInfoAction.ADD_PLAYER) {
+              return;
+            }
+
+            List<PlayerInfoData> newPlayerInfoDataList = Lists.newArrayList();
+
+            for (PlayerInfoData playerInfoData : playerInfoDataList) {
+              Player player;
+
+              if (playerInfoData == null || playerInfoData.getProfile() == null
+                  || (player = Bukkit.getPlayer(playerInfoData.getProfile().getUUID())) == null
+                  || !player.isOnline()) {
+                newPlayerInfoDataList.add(playerInfoData);
+                continue;
+              }
+
+              WrappedGameProfile profile = playerInfoData.getProfile();
+
+              String newNick = player.getDisplayName();
+
+              WrappedGameProfile newProfile = profile.withName(newNick);
+              newProfile.getProperties().putAll(profile.getProperties());
+
+              PlayerInfoData newPlayerInfoData = new PlayerInfoData(newProfile,
+                  playerInfoData.getPing(), playerInfoData.getGameMode(),
+                  playerInfoData.getDisplayName());
+              newPlayerInfoDataList.add(newPlayerInfoData);
+            }
+
+            wrapper.setData(newPlayerInfoDataList);
+          }
+        });
   }
 }

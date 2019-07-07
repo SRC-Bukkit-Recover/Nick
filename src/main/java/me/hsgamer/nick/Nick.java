@@ -3,11 +3,15 @@ package me.hsgamer.nick;
 import com.earth2me.essentials.Essentials;
 import me.hsgamer.nick.command.NickCommand;
 import me.hsgamer.nick.command.UnNickCommand;
+import me.hsgamer.nick.enums.ConfigEnum;
 import me.hsgamer.nick.files.ConfigFile;
 import me.hsgamer.nick.utils.Utils;
 import me.hsgamer.nick.utils.signgui.SignMenuFactory;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Nick extends JavaPlugin {
@@ -48,6 +52,16 @@ public final class Nick extends JavaPlugin {
     if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
       IS_ESSENTIALS_ENABLED = true;
       essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
+    }
+
+    if ((boolean) Utils.getValueFromConfig(ConfigEnum.SET_NAME_TAG)) {
+      Utils.addChangeNameTagListener();
+      getServer().getPluginManager().registerEvents(new Listener() {
+        @EventHandler
+        public void onJoin(PlayerJoinEvent event) {
+          Utils.refreshPlayer(event.getPlayer());
+        }
+      }, this);
     }
 
     this.signMenuFactory = new SignMenuFactory(this);

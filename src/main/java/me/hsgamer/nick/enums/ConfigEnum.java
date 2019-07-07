@@ -18,7 +18,8 @@ public enum ConfigEnum {
   PERMISSION_UNNICK("settings.permissions.unnick", "nick.unnick"),
   PERMISSION_COLOR("settings.permissions.color", "nick.color"),
   PERMISSION_TABLIST_NAME("settings.permissions.tablist-name", "nick.tablist"),
-  SET_PLAYER_LIST_NAME("settings.change-tablist-name", false);
+  SET_PLAYER_LIST_NAME("settings.change-tablist-name", false),
+  SET_NAME_TAG("settings.change-name-tag", false);
   String path;
   Object def;
 
