@@ -55,6 +55,14 @@ public class Utils {
     }
   }
 
+  public static String getNick(Player player) {
+    if (Nick.getInstance().IS_ESSENTIALS_ENABLED) {
+      return Nick.getInstance().getEssentials().getUser(player).getNickname();
+    } else {
+      return player.getDisplayName();
+    }
+  }
+
   public static void setPlayerListName(Player player, String nick, boolean colornize) {
     if ((boolean) getValueFromConfig(ConfigEnum.SET_PLAYER_LIST_NAME) && player
         .hasPermission((String) getValueFromConfig(ConfigEnum.PERMISSION_TABLIST_NAME))) {
@@ -85,7 +93,6 @@ public class Utils {
           public void onPacketSending(PacketEvent event) {
             WrapperPlayServerPlayerInfo wrapper = new WrapperPlayServerPlayerInfo(
                 event.getPacket());
-            Player target = event.getPlayer();
 
             List<PlayerInfoData> playerInfoDataList = wrapper.getData();
 
@@ -107,7 +114,7 @@ public class Utils {
 
               WrappedGameProfile profile = playerInfoData.getProfile();
 
-              String newNick = player.getDisplayName();
+              String newNick = getNick(player);
 
               WrappedGameProfile newProfile = profile.withName(newNick);
               newProfile.getProperties().putAll(profile.getProperties());
