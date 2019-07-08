@@ -78,8 +78,13 @@ public class Utils {
     if ((boolean) getValueFromConfig(ConfigEnum.SET_NAME_TAG)) {
       Bukkit.getScheduler().runTask(Nick.getInstance(), () -> {
         for (Player player : Bukkit.getOnlinePlayers()) {
-          player.hidePlayer(Nick.getInstance(), target);
-          player.showPlayer(Nick.getInstance(), target);
+          if (Nick.IS_LEGACY) {
+            player.hidePlayer(target);
+            player.showPlayer(target);
+          } else {
+            player.hidePlayer(Nick.getInstance(), target);
+            player.showPlayer(Nick.getInstance(), target);
+          }
         }
       });
     }

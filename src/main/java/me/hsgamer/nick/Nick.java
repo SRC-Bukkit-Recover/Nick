@@ -56,12 +56,6 @@ public final class Nick extends JavaPlugin {
 
     if ((boolean) Utils.getValueFromConfig(ConfigEnum.SET_NAME_TAG)) {
       Utils.addChangeNameTagListener();
-      getServer().getPluginManager().registerEvents(new Listener() {
-        @EventHandler
-        public void onJoin(PlayerJoinEvent event) {
-          Utils.refreshPlayer(event.getPlayer());
-        }
-      }, this);
     }
 
     this.signMenuFactory = new SignMenuFactory(this);
