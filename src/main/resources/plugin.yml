@@ -1,5 +1,5 @@
 name: SignNick
-version: ${project.version}
+version: "${project.version}"
 main: me.hsgamer.nick.Nick
 authors:
   - HSGamer
