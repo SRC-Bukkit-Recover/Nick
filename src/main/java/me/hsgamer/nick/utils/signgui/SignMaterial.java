@@ -5,17 +5,20 @@ import org.bukkit.Material;
 
 public class SignMaterial {
 
-  public static Material SIGN;
+  private static Material sign;
 
-  static {
-    try {
-      SIGN = Material.OAK_WALL_SIGN;
-    } catch (NoSuchFieldError e) {
-      if (Nick.IS_LEGACY) {
-        SIGN = Material.matchMaterial("SIGN_POST");
-      } else {
-        SIGN = Material.matchMaterial("WALL_SIGN");
+  public static Material getSign() {
+    if (sign == null) {
+      try {
+        sign = Material.OAK_WALL_SIGN;
+      } catch (NoSuchFieldError e) {
+        if (Nick.IS_LEGACY) {
+          sign = Material.matchMaterial("SIGN_POST");
+        } else {
+          sign = Material.matchMaterial("WALL_SIGN");
+        }
       }
     }
+    return sign;
   }
 }

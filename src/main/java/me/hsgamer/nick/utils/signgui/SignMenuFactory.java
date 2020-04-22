@@ -153,7 +153,7 @@ public final class SignMenuFactory {
       PacketContainer block = ProtocolLibrary.getProtocolManager()
           .createPacket(PacketType.Play.Server.BLOCK_CHANGE);
       block.getBlockPositionModifier().write(0, position);
-      block.getBlockData().write(0, WrappedBlockData.createData(SignMaterial.SIGN));
+      block.getBlockData().write(0, WrappedBlockData.createData(SignMaterial.getSign()));
 
       PacketContainer openSign = ProtocolLibrary.getProtocolManager()
           .createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);

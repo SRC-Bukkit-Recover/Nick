@@ -8,10 +8,7 @@ import me.hsgamer.nick.files.ConfigFile;
 import me.hsgamer.nick.utils.Utils;
 import me.hsgamer.nick.utils.signgui.SignMenuFactory;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Nick extends JavaPlugin {
