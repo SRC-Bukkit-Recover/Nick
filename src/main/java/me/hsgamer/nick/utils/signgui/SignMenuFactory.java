@@ -16,8 +16,8 @@ import java.util.function.BiPredicate;
 import java.util.logging.Level;
 import java.util.stream.IntStream;
 import me.hsgamer.nick.Nick;
+import me.hsgamer.nick.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -121,7 +121,7 @@ public final class SignMenuFactory {
       NbtCompound signNBT = (NbtCompound) signData.getNbtModifier().read(0);
 
       IntStream.range(0, SIGN_LINES).forEach(line -> signNBT.put("Text" + (line + 1),
-          text.size() > line ? String.format(NBT_FORMAT, color(text.get(line))) : " "));
+          text.size() > line ? String.format(NBT_FORMAT, Utils.colornize(text.get(line))) : " "));
 
       signNBT.put("x", this.position.getX());
       signNBT.put("y", this.position.getY());
@@ -140,10 +140,6 @@ public final class SignMenuFactory {
             .log(Level.WARNING, "Error when sending the packet", exception);
       }
       inputReceivers.put(player, this);
-    }
-
-    private String color(String input) {
-      return ChatColor.translateAlternateColorCodes('&', input);
     }
   }
 }
