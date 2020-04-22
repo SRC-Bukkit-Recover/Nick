@@ -152,8 +152,8 @@ public final class SignMenuFactory {
 
       PacketContainer block = ProtocolLibrary.getProtocolManager()
           .createPacket(PacketType.Play.Server.BLOCK_CHANGE);
-      block.getBlockPositionModifier().write(0, position);
-      block.getBlockData().write(0, WrappedBlockData.createData(SignMaterial.getSign()));
+      block.getBlockPositionModifier().write(0, this.position);
+      block.getBlockData().write(0, WrappedBlockData.createData(SignMaterial.getSign(), 0));
 
       PacketContainer openSign = ProtocolLibrary.getProtocolManager()
           .createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);
@@ -163,7 +163,7 @@ public final class SignMenuFactory {
       if (Nick.IS_LEGACY) {
         signData = ProtocolLibrary.getProtocolManager()
             .createPacket(PacketType.Play.Server.UPDATE_SIGN);
-        signData.getBlockPositionModifier().write(0, position);
+        signData.getBlockPositionModifier().write(0, this.position);
         signData.getChatComponentArrays().write(0, wrap(text.toArray(new String[0])));
       } else {
         signData = ProtocolLibrary.getProtocolManager()
