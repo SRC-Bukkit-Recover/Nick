@@ -148,8 +148,7 @@ public final class SignMenuFactory {
     public void open(Player player) {
       Objects.requireNonNull(player, "player");
       Location location = player.getLocation();
-      this.position = new BlockPosition(location.getBlockX(), location.getBlockY() - 5,
-          location.getBlockZ());
+      this.position = new BlockPosition(location.getBlockX(), 0, location.getBlockZ());
 
       PacketContainer block = ProtocolLibrary.getProtocolManager()
           .createPacket(PacketType.Play.Server.BLOCK_CHANGE);
