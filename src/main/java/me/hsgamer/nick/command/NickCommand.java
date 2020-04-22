@@ -32,7 +32,7 @@ public class NickCommand implements CommandExecutor {
     lines.add("");
     lines.addAll((List<String>) Utils.getValueFromConfig(ConfigEnum.SIGN_LINES));
     Nick.getInstance().getSignMenuFactory()
-        .newMenu(sender, lines)
+        .newMenu(lines)
         .reopenIfFail()
         .response(((player, strings) -> {
           String nick = StringUtils.strip(strings[0]);
@@ -48,6 +48,6 @@ public class NickCommand implements CommandExecutor {
           }
           return true;
         }))
-        .open();
+        .open(sender);
   }
 }
