@@ -43,7 +43,7 @@ public final class Nick extends JavaPlugin {
 
     if (IS_LEGACY = getServer().getVersion().contains("1.8")) {
       Utils.sendMessage(getServer().getConsoleSender(),
-          "&eYou are using an old version of Bukkit. &bInitializing Legacy Listener...", true);
+          "&eYou are using an old version of Bukkit.", true);
     }
 
     if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {

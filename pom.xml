@@ -42,13 +42,6 @@
       <scope>provided</scope>
       <version>2.16.1</version>
     </dependency>
-    <dependency>
-      <artifactId>craftbukkit</artifactId>
-      <groupId>org.bukkit</groupId>
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/craftbukkit-1.8.8.jar</systemPath>
-      <version>1.8.8-R0.1-SNAPSHOT</version>
-    </dependency>
   </dependencies>
   <description>NickName with sign-based editor</description>
   <groupId>me.HSGamer</groupId>
