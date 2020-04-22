@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.stream.IntStream;
 import me.hsgamer.nick.Nick;
 import me.hsgamer.nick.utils.Utils;
@@ -38,12 +38,10 @@ public final class SignMenuFactory {
   private final Plugin plugin;
 
   private final Map<Player, Menu> inputReceivers;
-  private final Map<Player, BlockPosition> signLocations;
 
   public SignMenuFactory(Plugin plugin) {
     this.plugin = plugin;
     this.inputReceivers = new HashMap<>();
-    this.signLocations = new HashMap<>();
     this.listen();
   }
 
@@ -69,15 +67,9 @@ public final class SignMenuFactory {
     return stringList.toArray(new String[0]);
   }
 
-  public Menu newMenu(Player player, List<String> text) {
-    Objects.requireNonNull(player, "player");
+  public Menu newMenu(List<String> text) {
     Objects.requireNonNull(text, "text");
-    Menu menu = new Menu(player, text);
-    menu.onOpen(blockPosition -> {
-      this.signLocations.put(player, blockPosition);
-      this.inputReceivers.putIfAbsent(player, menu);
-    });
-    return menu;
+    return new Menu(text);
   }
 
   private void listen() {
@@ -87,6 +79,7 @@ public final class SignMenuFactory {
           public void onPacketReceiving(PacketEvent event) {
             PacketContainer packet = event.getPacket();
             Player player = event.getPlayer();
+
             String[] input;
             if (Nick.IS_LEGACY) {
               input = unwrap(packet.getChatComponentArrays().read(0));
@@ -95,50 +88,50 @@ public final class SignMenuFactory {
             }
 
             Menu menu = inputReceivers.remove(player);
-            BlockPosition blockPosition = signLocations.remove(player);
 
-            if (menu == null || blockPosition == null) {
+            if (menu == null) {
               return;
             }
             event.setCancelled(true);
 
             boolean success = menu.response.test(player, input);
 
-            if (!success && menu.reopenIfFail) {
-              Bukkit.getScheduler().runTaskLater(plugin, menu::open, 2L);
+            if (!success && menu.opensOnFail()) {
+              Bukkit.getScheduler().runTaskLater(plugin, () -> menu.open(player), 2L);
             }
 
             PacketContainer remove = ProtocolLibrary.getProtocolManager()
                 .createPacket(PacketType.Play.Server.BLOCK_CHANGE);
-            remove.getBlockPositionModifier().write(0, blockPosition);
+            remove.getBlockPositionModifier().write(0, menu.position);
             remove.getBlockData().write(0, WrappedBlockData.createData(Material.AIR));
             try {
               ProtocolLibrary.getProtocolManager().sendServerPacket(player, remove);
             } catch (InvocationTargetException e) {
-              e.printStackTrace();
+              Nick.getInstance().getLogger().log(Level.WARNING, "Error when sending the packet", e);
             }
           }
         });
   }
 
-  public static final class Menu {
-
-    private final Player player;
+  public class Menu {
 
     private final List<String> text;
-    private BiPredicate<Player, String[]> response;
 
+    private BiPredicate<Player, String[]> response;
     private boolean reopenIfFail;
 
-    private Consumer<BlockPosition> onOpen;
+    private BlockPosition position;
 
-    Menu(Player player, List<String> text) {
-      this.player = player;
+    Menu(List<String> text) {
       this.text = text;
     }
 
-    void onOpen(Consumer<BlockPosition> onOpen) {
-      this.onOpen = onOpen;
+    protected BlockPosition getPosition() {
+      return this.position;
+    }
+
+    public boolean opensOnFail() {
+      return this.reopenIfFail;
     }
 
     public Menu reopenIfFail() {
@@ -151,26 +144,27 @@ public final class SignMenuFactory {
       return this;
     }
 
-    public void open() {
-      Location location = this.player.getLocation();
-      BlockPosition blockPosition = new BlockPosition(location.getBlockX(), 0,
+    @SuppressWarnings("deprecated")
+    public void open(Player player) {
+      Objects.requireNonNull(player, "player");
+      Location location = player.getLocation();
+      this.position = new BlockPosition(location.getBlockX(), location.getBlockY() - 5,
           location.getBlockZ());
 
       PacketContainer block = ProtocolLibrary.getProtocolManager()
           .createPacket(PacketType.Play.Server.BLOCK_CHANGE);
-      block.getBlockPositionModifier().write(0, blockPosition);
+      block.getBlockPositionModifier().write(0, position);
       block.getBlockData().write(0, WrappedBlockData.createData(SignMaterial.SIGN));
 
       PacketContainer openSign = ProtocolLibrary.getProtocolManager()
           .createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);
-      openSign.getBlockPositionModifier().write(0, blockPosition);
+      openSign.getBlockPositionModifier().write(0, this.position);
 
       PacketContainer signData;
       if (Nick.IS_LEGACY) {
         signData = ProtocolLibrary.getProtocolManager()
             .createPacket(PacketType.Play.Server.UPDATE_SIGN);
-
-        signData.getBlockPositionModifier().write(0, blockPosition);
+        signData.getBlockPositionModifier().write(0, position);
         signData.getChatComponentArrays().write(0, wrap(text.toArray(new String[0])));
       } else {
         signData = ProtocolLibrary.getProtocolManager()
@@ -179,15 +173,14 @@ public final class SignMenuFactory {
         NbtCompound signNBT = (NbtCompound) signData.getNbtModifier().read(0);
 
         IntStream.range(0, SIGN_LINES).forEach(line -> signNBT.put("Text" + (line + 1),
-            text.size() > line ? String.format(NBT_FORMAT, Utils.colornize(text.get(line)))
-                : "WW"));
+            text.size() > line ? String.format(NBT_FORMAT, Utils.colornize(text.get(line))) : " "));
 
-        signNBT.put("x", blockPosition.getX());
-        signNBT.put("y", blockPosition.getY());
-        signNBT.put("z", blockPosition.getZ());
+        signNBT.put("x", this.position.getX());
+        signNBT.put("y", this.position.getY());
+        signNBT.put("z", this.position.getZ());
         signNBT.put("id", NBT_BLOCK_ID);
 
-        signData.getBlockPositionModifier().write(0, blockPosition);
+        signData.getBlockPositionModifier().write(0, this.position);
         signData.getIntegers().write(0, ACTION_INDEX);
         signData.getNbtModifier().write(0, signNBT);
       }
@@ -197,9 +190,9 @@ public final class SignMenuFactory {
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, signData);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, openSign);
       } catch (InvocationTargetException exception) {
-        exception.printStackTrace();
+        Nick.getInstance().getLogger().log(Level.WARNING, "Error when opening the sign", exception);
       }
-      this.onOpen.accept(blockPosition);
+      inputReceivers.put(player, this);
     }
   }
 }
