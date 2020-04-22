@@ -13,7 +13,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Nick extends JavaPlugin {
 
-  public static boolean IS_LEGACY = false;
   private static Nick instance;
   public boolean IS_ESSENTIALS_ENABLED;
   private SignMenuFactory signMenuFactory;
@@ -40,11 +39,6 @@ public final class Nick extends JavaPlugin {
         false);
 
     this.configFile = new ConfigFile(this);
-
-    if (IS_LEGACY = getServer().getVersion().contains("1.8")) {
-      Utils.sendMessage(getServer().getConsoleSender(),
-          "&eYou are using an old version of Bukkit.", true);
-    }
 
     if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
       IS_ESSENTIALS_ENABLED = true;

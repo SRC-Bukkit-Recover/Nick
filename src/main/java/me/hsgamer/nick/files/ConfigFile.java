@@ -10,10 +10,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConfigFile {
 
+  private final JavaPlugin plugin;
+  private final String filename = "config.yml";
   private FileConfiguration config;
   private File configFile;
-  private JavaPlugin plugin;
-  private String filename = "config.yml";
 
   public ConfigFile(JavaPlugin plugin) {
     this.plugin = plugin;
